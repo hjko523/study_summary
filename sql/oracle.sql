@@ -61,98 +61,10 @@ select * from salgrade;
 --  ==========================================================================================  
 
 
+-- //                //
+-- //   DATE - 날짜   //
+-- //                //
 
--- //       //
--- // JOIN  //
--- //       //
-
--- * on       : join 전에 조건을 필터링
--- * where    : join 후에 조건을 필터링
-
-
-
--- //  Equi join (등가조인)   //
-
-select  emp.empno,
-        emp.ename,
-        emp.deptno,
-        dept.dname
-from
-        emp, dept           
-where 
-        emp.deptno = dept.deptno;
-        
-
-        
--- // non-equal join (비 등가조인)  //
--- // 사원명, 급여, 등급 조회
-
-select  e.ename,
-        e.sal,
-        s.grade
-from
-        emp e, salgrade s
-where   
-        e.sal between s.losal and s.hisal;
-        
-        
--- // outer join   //
-
-select  e.empno,
-        e.ename,
-        e.deptno,
-        d.dname
-from
-        emp e, dept d
-where
-        -- e.deptno = d.deptno;
-        e.deptno(+) = d.deptno;
-        
--- 부족한 부분에 (+)를 붙이면 일반조인에서 나타나지 않은 부분이 출력됨
-
-
-
--- // self join   //
--- // 사원이름, 매니저 이름
-
-select ename, mgr from emp;
-
-
-select  e.ename,
-        e.mgr,
-        m.ename
-from    
-        emp e, emp m
-where   
-        e.mgr = m.empno;
-        
--- ex) 연결연산자 이용
-select 
-        e.ename || '의 상사는 ' || m.ename || '이다' as 직속상사관계  -- mysql에서는 as다음에 ''를 붙여야함
-from
-        emp e, emp m
-where 
-        e.mgr = m.empno;
-
-
--- //  연결 연산자  //
-
-select
-        ename || ',' || job from emp;
--- * mySql : select concat (ename, ',', job) from emp;
-
-
--- //  in  //
-
-select ename, deptno from emp where deptno = 10 or deptno = 20;
-select ename, deptno from emp where deptno in (10, 20);
-
-
---  ==========================================================================================   
-
--- //        //
--- //  date  //
--- //        //
 
 -- 1) 날짜
 select sysdate from dual;
@@ -191,21 +103,186 @@ select * from emp where  ename like 'k___';             -- k로 시작하는 4�
 select * from emp where  ename like 's\_%' escape '\';  
 select * from emp;
 
--- //                               //
--- //  트랜잭션                      //
--- //  commit, rollback, savepoint  //
--- //                               //
 
-
-rollback to sp1;
-savepoint sp1;
 
 --  ==========================================================================================   
 
--- //                 //
--- //  sequence 시퀀스 //
--- //                 //
+CREATE TABLE employees
+  (
+    employee_id NUMBER PRIMARY KEY,
+    first_name VARCHAR( 255 ) NOT NULL,
+    last_name  VARCHAR( 255 ) NOT NULL,
+    email      VARCHAR( 255 ) NOT NULL,
+    phone      VARCHAR( 50 ) NOT NULL ,
+    hire_date  DATE NOT NULL          ,
+    manager_id NUMBER( 12)        , 
+    job_title  VARCHAR( 255 ) NOT NULL
+    
+  );
+
+Insert into EMPLOYEES (EMPLOYEE_ID,FIRST_NAME,LAST_NAME,EMAIL,PHONE,HIRE_DATE,MANAGER_ID,JOB_TITLE) values (1,'Summer','Payne','summer.payne@example.com','515.123.8181',to_date('07-06-16','DD-mm-RR'),106,'Public Accountant');
+Insert into EMPLOYEES (EMPLOYEE_ID,FIRST_NAME,LAST_NAME,EMAIL,PHONE,HIRE_DATE,MANAGER_ID,JOB_TITLE) values (2,'Rose','Stephens','rose.stephens@example.com','515.123.8080',to_date('07-06-16','DD-mm-RR'),2,'Accounting Manager');
+Insert into EMPLOYEES (EMPLOYEE_ID,FIRST_NAME,LAST_NAME,EMAIL,PHONE,HIRE_DATE,MANAGER_ID,JOB_TITLE) values (3,'Annabelle','Dunn','annabelle.dunn@example.com','515.123.4444',to_date('17-09-16','DD-mm-RR'),2,'Administration Assistant');
+Insert into EMPLOYEES (EMPLOYEE_ID,FIRST_NAME,LAST_NAME,EMAIL,PHONE,HIRE_DATE,MANAGER_ID,JOB_TITLE) values (4,'Tommy','Bailey','tommy.bailey@example.com','515.123.4567',to_date('17-06-16','DD-mm-RR'),null,'President');
+Insert into EMPLOYEES (EMPLOYEE_ID,FIRST_NAME,LAST_NAME,EMAIL,PHONE,HIRE_DATE,MANAGER_ID,JOB_TITLE) values (5,'Blake','Cooper','blake.cooper@example.com','515.123.4569',to_date('13-01-16','DD-mm-RR'),1,'Administration Vice President');
+Insert into EMPLOYEES (EMPLOYEE_ID,FIRST_NAME,LAST_NAME,EMAIL,PHONE,HIRE_DATE,MANAGER_ID,JOB_TITLE) values (6,'Jude','Rivera','jude.rivera@example.com','515.123.4568',to_date('21-10-16','DD-mm-RR'),1,'Administration Vice President');
+Insert into EMPLOYEES (EMPLOYEE_ID,FIRST_NAME,LAST_NAME,EMAIL,PHONE,HIRE_DATE,MANAGER_ID,JOB_TITLE) values (7,'Tyler','Ramirez','tyler.ramirez@example.com','515.124.4269',to_date('28-10-16','DD-mm-RR'),9,'Accountant');
+Insert into EMPLOYEES (EMPLOYEE_ID,FIRST_NAME,LAST_NAME,EMAIL,PHONE,HIRE_DATE,MANAGER_ID,JOB_TITLE) values (8,'Ryan','Gray','ryan.gray@example.com','515.124.4169',to_date('16-08-16','DD-mm-RR'),9,'Accountant');
+
+
+
+-- //                                       //
+-- //   정렬 & 집합연산                       //
+-- //   order by                            //
+-- //   union, union all, intersect, minus  // 
+-- //                                       //
+
+
+-- //  1) ORDER BY 
+-- * ASC : 오름차순 (기본)
+-- * DESC : 내림차순
+
+SELECT      first_name, last_name 
+FROM        employees
+ORDER BY    first_name;
+
+SELECT first_name, last_name
+FROM employees
+ORDER BY first_name DESC;
+
+-- // 2) UNION - 합집합 (중복 제외)
+SELECT employee_id, first_name
+FROM employees
+WHERE employee_id <= 6
+    UNION
+SELECT employee_id, first_name
+FROM employees
+WHERE employee_id >= 4;
+
+-- // 3) UNION ALL - 합집합 (중복 포함)
+SELECT employee_id, first_name
+FROM employees
+WHERE employee_id <= 6
+    UNION ALL
+SELECT employee_id, first_name
+FROM employees
+WHERE employee_id >= 4;
+
+-- // 4) MINUS - 차집합
+SELECT employee_id, first_name
+FROM employees
+WHERE employee_id <= 6
+    MINUS
+SELECT employee_id, first_name
+FROM employees
+WHERE employee_id >= 4;
+
+-- // 5) INTERSECT - 교집합
+SELECT employee_id, first_name
+FROM employees
+WHERE employee_id <= 6
+    INTERSECT
+SELECT employee_id, first_name
+FROM employees
+WHERE employee_id >= 4;
+
+--  ==========================================================================================  
+
+-- //         //
+-- //   함수   //
+-- //         //
+
+
+-- // 1) 문자함수
+
+-- LOWER() 소문자로 변환 
+-- >> LOWER('SUAN') -- suan
+
+-- UPPER() 대문자로 변환 
+-- >> UPPER('suan') --SUAN
+
+-- INITCAP() 첫 문자만 대문자로 변환 
+-- >> INITCAP('suan') --Suan
+
+-- SUBSTR() 일부 문자열만 추출 
+-- >> ('Suan', 1, 2) --Su
+
+-- REPLACE() 특정 문자열을 찾아 바꾸기 
+-- >> REPLACE('Suan', 'u', 'e') --Sean
+
+-- CONCAT() 두 문자열 연결 
+-- >> CONCAT('Suan', 'Lee') --SuanLee
+
+-- LENGTH() 문자열 길이 
+-- >> LENGTH('Suan') --4
+
+-- INSTR() 문자열 위치 
+-- >> INSTR('Suan', 'a') --3
+
+-- LPAD() 왼쪽부터 특정 문자로 채움 
+-- >> LPAD('Suan', 7, '*') --***Suan
+
+-- RPAD() 오른쪽부터 특정 문자로 채움 
+-- >> RPAD('Suan', 7, '*') --Suan***
+
+-- LTRIM() 왼쪽 특정 문자를 지움 
+-- >> LTRIM('Suan', 'Su') --an
+
+-- RTRIM() 오른쪽 특정 문자를 지움 
+-- >> RTRIM('Suan', 'an') --Su
+
+
+-- // 2) 숫자함수
+
+-- CEIL() 정수 올림 
+-- >> CEIL(12.345) -- 13
+
+-- FLOOR() 정수 내림 
+-- >> FLOOR(12.345) -- 12
+
+-- ROUND() 반올림 
+-- >> ROUND(12.345, 0) -- 12
+
+-- TRUNC() 절삭 
+-- >> TRUNC(12.345, 1) -- 12.3
+
+-- MOD() 나눈 나머지 
+-- >> MOD(12, 5) -- 2
+
+-- SIGN() 양수, 음수, 0 구분 
+-- >> SIGN(12) -- 1
+
+-- POWER() 거듭제곱 
+-- >> POWER(3, 3) -- 27
+
+-- SQRT() 제곱근 
+-- >> SQRT(4) -- 2
+
+
+
+-- // 3) 집계함수
+
+-- COUNT()      -- 행의 개수 
+-- SUM()        -- 합계
+-- AVG()        -- 평균
+-- MIN()        -- 최솟값
+-- MAX()        -- 최댓값 
+-- STDDEV()     -- 표준편차 
+-- VARIANCE()   -- 분산 
+
+
+
+--  ==========================================================================================   
+
+
+
+-- //                    //
+-- //   sequence 시퀀스   //
+-- //                    //
+
+
 -- * auto_increment (mySql)
+
 
 -- // 테이블 데이터 초기화
 truncate table nboard;
@@ -237,12 +314,118 @@ insert into nboard (unq, title, pass, name, rdate)
 -- 시퀀스 확인
 select nboard_seq.currval from dual;
 
+
+
+--  ==========================================================================================   
+
+-- //          //
+-- //   JOIN   //
+-- //          //
+
+-- * on       : join 전에 조건을 필터링
+-- * where    : join 후에 조건을 필터링
+
+
+
+-- //  Equi join (등가조인)   
+
+select  emp.empno,
+        emp.ename,
+        emp.deptno,
+        dept.dname
+from
+        emp, dept           
+where 
+        emp.deptno = dept.deptno;
+        
+
+        
+-- // non-equal join (비 등가조인)  
+-- // 사원명, 급여, 등급 조회
+
+select  e.ename,
+        e.sal,
+        s.grade
+from
+        emp e, salgrade s
+where   
+        e.sal between s.losal and s.hisal;
+        
+        
+-- // outer join   
+
+select  e.empno,
+        e.ename,
+        e.deptno,
+        d.dname
+from
+        emp e, dept d
+where
+        -- e.deptno = d.deptno;
+        e.deptno(+) = d.deptno;
+        
+-- 부족한 부분에 (+)를 붙이면 일반조인에서 나타나지 않은 부분이 출력됨
+
+
+
+-- // self join   
+-- // 사원이름, 매니저 이름
+
+select ename, mgr from emp;
+
+
+select  e.ename,
+        e.mgr,
+        m.ename
+from    
+        emp e, emp m
+where   
+        e.mgr = m.empno;
+        
+-- ex) 연결연산자 이용
+select 
+        e.ename || '의 상사는 ' || m.ename || '이다' as 직속상사관계  -- mysql에서는 as다음에 ''를 붙여야함
+from
+        emp e, emp m
+where 
+        e.mgr = m.empno;
+
+
+-- //  연결 연산자  //
+
+select
+        ename || ',' || job from emp;
+-- * mySql : select concat (ename, ',', job) from emp;
+
+
+-- //  in 
+-- // 여러개의 데이터 값을 지정하여 일치하는 데이터만 출력할 때 사용
+
+select ename, deptno from emp where deptno = 10 or deptno = 20;
+select ename, deptno from emp where deptno in (10, 20);
+
+
+
+--  ==========================================================================================  
+
+
+-- //                               //
+-- //  트랜잭션                      //
+-- //  commit, rollback, savepoint  //
+-- //                               //
+
+
+rollback to sp1;
+savepoint sp1;
+
+
+
 --  ==========================================================================================   
 
 
--- //                      //
--- //  view table 뷰테이블  //
--- //                      //
+-- //                        //
+-- //   view table 뷰테이블   //
+-- //                        //
 
 -- // 사용권한 세팅
 -- (뷰테이블 사용을 위해서는 권한이 필요)
@@ -305,9 +488,9 @@ select ename, (sal + nvl2(comm, 0,+100)) from emp;
 --  ==========================================================================================   
 
 
--- //                      //
--- //  decode() - 조건함수  //
--- //                      //
+-- //                        //
+-- //   decode() - 조건함수   //
+-- //                        //
 
 -- decode(컬럼명, 비교값1, 치환값1, 비교값2, 치환값2, ...)
 
@@ -320,9 +503,9 @@ select ename,
 --  ==========================================================================================   
 
 
--- //                       //
--- //  foreign key - 외래키  //
--- //                       //
+-- //                         //
+-- //   FOREIGN KEY - 외래키   //
+-- //                         //
 
 -- 외래키 설정
 -- : constraint 외래키별칭 foreign key(컬럼명) references 외래테이블명(컬럼명)
@@ -335,12 +518,15 @@ alter table jumsu add constraint jumsu_pk2 foreign key(userid) references studen
 
 
 
---  ==========================================================================================   
+
+-- ------------------------------------------------
 
 
--- //                      //
--- //   procedure 프로시저  //
--- //                      //
+
+
+-- //                         //
+-- //    procedure 프로시저    //
+-- //                         //
 -- * sql과 별도로 독립적으로 실행됨
 
 
@@ -387,9 +573,9 @@ end;
 -- ------------------------------------------------
 
 
--- //                  //
--- //   function 함수  //
--- //                  //
+-- //                    //
+-- //   function - 함수   
+-- //                    //
 
 
 -- 함수 생성
