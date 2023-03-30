@@ -634,13 +634,13 @@ EXCEPTION
 END;
 
 
--- 2) 파라미터를 사용하는 프로시저
+-- 2) 파라미터를 사용하는 프로시저 (IN모드 파라미터)
 
 CREATE OR REPLACE PROCEDURE 프로시저명
-    (   -- 파라미터
-        param1 in number,       -- IN모드 파라미터 : 직접 입력받는 형식
-        param2 out number,      -- OUT모드 파라미터 : 프로시저를 실행 후 호출한 프로그램으로 값을 반환 받을 수 있는 방식
-        param3 number
+    (   
+        -- 파라미터
+        param1 in number,       -- IN모드 파라미터 : 직접 입력받는 형식 
+        param2 number
     )
 IS
     -- 선언부 (변수 선언)
@@ -653,7 +653,27 @@ END;
 
 
 
--- 프로시저 내 테이블 생성
+-- 3) 파라미터를 사용하는 프로시저 (OUT모드 파라미터)
+
+CREATE OR REPLACE PROCEDURE 프로시저명
+    (   
+        -- 파라미터
+        param out number      -- OUT모드 파라미터 : 프로시저를 실행 후 호출한 프로그램으로 값을 반환 받을 수 있는 방식      
+    )
+IS
+    -- 선언부 (변수 선언)
+BEGIN
+    -- 실행부  
+EXCEPTION
+    -- 예외처리부
+END 프로시저명;
+
+
+-- 4) 프로시저 내 출력
+
+DBMS_OUTPUT.PUT_LINE();
+
+-- 5) 프로시저 내 테이블 생성
 CHK NUMBER := 0;
 
 
