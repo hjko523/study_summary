@@ -186,6 +186,8 @@ SELECT employee_id, first_name
 FROM employees
 WHERE employee_id >= 4;
 
+
+
 --  ==========================================================================================  
 
 -- //         //
@@ -288,6 +290,11 @@ select to_char(sysdate, 'yyyy-mm-dd') from dual;
 -- 문자 -> 날짜 : to_date()
 select to_char(to_date('20201205111701', 'yyyymmddhh24miss'), 'yyyy/mm/dd hh:mm:ss')as one,
 to_date('20200505090101', 'yyyymmddhhmiss') as two from dual;
+
+
+-- 5) 기타
+
+-- :=  -> 대입 연산자 
 
 --  ==========================================================================================   
 
@@ -611,7 +618,40 @@ alter table jumsu add constraint jumsu_pk2 foreign key(userid) references studen
 -- //                         //
 -- //    procedure 프로시저    //
 -- //                         //
+
+--  // 특정 처리 작업을 수행하는 저장 서브프로그램
 -- * sql과 별도로 독립적으로 실행됨
+
+-- 1) 파라미터를 사용하지 않는 프로시저
+
+CREATE OR REPLACE PROCEDURE 프로시저명
+IS
+    -- 선언부 (변수 선언)
+BEGIN
+    -- 실행부
+EXCEPTION
+    -- 예외처리부
+END;
+
+
+-- 2) 파라미터를 사용하는 프로시저
+
+CREATE OR REPLACE PROCEDURE 프로시저명
+    (   -- 파라미터
+        param1 in number,       -- IN모드 파라미터 : 직접 입력받는 형식
+        param2 out number,      -- OUT모드 파라미터 : 프로시저를 실행 후 호출한 프로그램으로 값을 반환 받을 수 있는 방식
+        param3 number
+    )
+IS
+    -- 선언부 (변수 선언)
+BEGIN
+    -- 실행부  (ex) DBMS_OUTPUT.PUT_LINE('param1: ' || param1); 
+EXCEPTION
+    -- 예외처리부
+END;
+
+
+
 
 -- 프로시저 내 테이블 생성
 CHK NUMBER := 0;
