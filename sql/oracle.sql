@@ -272,6 +272,23 @@ WHERE employee_id >= 4;
 
 
 
+-- // 4) 형변환 함수
+
+-- cast()       -- 단순한 데이터 타입 변환에 사용하기 편함
+CASE(형변환할 컬럼 AS 변환할타입);
+
+-- to_number()
+select to_number('512') from dual;      -- (결과) 512 (데이터형 : 숫자)
+
+-- 날짜 -> 문자 : to_char()
+select sysdate from dual;
+select to_char(sysdate, 'yyyy') from dual;
+select to_char(sysdate, 'yyyy-mm-dd') from dual;
+
+-- 문자 -> 날짜 : to_date()
+select to_char(to_date('20201205111701', 'yyyymmddhh24miss'), 'yyyy/mm/dd hh:mm:ss')as one,
+to_date('20200505090101', 'yyyymmddhhmiss') as two from dual;
+
 --  ==========================================================================================   
 
 
@@ -313,6 +330,73 @@ insert into nboard (unq, title, pass, name, rdate)
         
 -- 시퀀스 확인
 select nboard_seq.currval from dual;
+
+
+
+--  ==========================================================================================   
+
+-- //               //
+-- //   WITH        //
+-- //   보조쿼리문    //
+
+
+WITH
+   name_for_summary_data AS (
+      SELECT Statement)
+   SELECT columns
+   FROM name_for_summary_data
+   WHERE conditions <=> (
+      SELECT column
+      FROM name_for_summary_data)
+   [ORDER BY columns];
+   
+   
+-- // WITH절 생성 
+WITH emp_with AS 
+(
+    SELECT deptno, SUM(sal) AS sal 
+    FROM emp 
+    GROUP BY deptno
+)
+
+-- // WITH절 사용 example
+SELECT a.deptno, b.name, c.sal
+FROM emp_with a , dept b 
+WHERE a.deptno = b.deptno 
+
+
+
+
+
+
+--  ==========================================================================================   
+ 
+-- //              //
+-- //    HAVING    //
+-- //              //
+
+-- // group by 절에 의해 생성된 그룹에 조건을 지정
+
+-- * GROUP BY와 함께 사용
+
+SELECT NAME FROM COMPANY GROUP BY name HAVING count(name) > 1;
+
+
+
+
+
+--  ==========================================================================================   
+ 
+-- //                //
+-- //    DISTINCT    //
+-- //                //
+  
+
+SELECT DISTINCT column1, column2, ...
+FROM table_name;
+
+
+
 
 
 
@@ -476,10 +560,10 @@ select ename, nvl(mgr, 0) from emp;
 select ename, sal, comm from emp;
 
 -- 2) nvl2(필드값, 처리1, 처리2)
--- null : 0 / !null : +100
+-- ex) null : 0 / !null : +100 일때,
 select ename, (sal + comm) from emp;
 select ename, (sal + nvl(comm, 0)) from emp;
-select ename, (sal + nvl2(comm, 0,+100)) from emp;
+select ename, (sal + nvl2(comm, 0, +100)) from emp;
 
 
 
@@ -528,6 +612,9 @@ alter table jumsu add constraint jumsu_pk2 foreign key(userid) references studen
 -- //    procedure 프로시저    //
 -- //                         //
 -- * sql과 별도로 독립적으로 실행됨
+
+-- 프로시저 내 테이블 생성
+CHK NUMBER := 0;
 
 
 -- 사원번호를 입력받아 급여를 출력하는 프로시저
@@ -658,3 +745,41 @@ drop index regist_date_idx;
 drop index email_idx;       -- unique 인덱스도 바로 삭제됨
 
 drop table customers;       -- table을 삭제하면 해당 인덱스도 함께 삭제된다.
+
+
+-- ------------------------------------------------
+
+
+-- //           //
+-- //   MERGE   //
+-- //           //
+
+/*
+MERGE
+INTO    테이블/뷰
+USING   테이블/뷰/서브쿼리
+ON      조건절
+WHEN MATCHED THEN   -- 일치하는 경우 update/ delete
+    UPDATE SET .....
+    DELETE ....
+WHEN NOT MATCHED THEN   -- 불일치하는 경우 insert
+    INSERT 컬럼명 VALUES 데이터
+
+*/
+
+
+
+
+-- ------------------------------------------------
+
+
+-- //                 //
+-- //   SELECT INTO   //
+-- //                 //
+
+-- // 한 테이블에서 새로운 테이블로 정보를 복사할 때 사용
+
+select first_name, last_name into emp_backup from employees;
+
+-- 저장 프로시저에서만 사용되기 때문에 일반 쿼리에서 사용하려면 into를 제거하거나 as로 변경하여야함
+select first_name, last_name as emp_backup from employees;  
